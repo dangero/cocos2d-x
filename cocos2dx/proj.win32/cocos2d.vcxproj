@@ -70,8 +70,7 @@
     </ClCompile>
     <PreLinkEvent>
       <Command>if not exist "$(OutDir)" mkdir "$(OutDir)"
-xcopy /Y /Q "$(ProjectDir)..\..\cocos2dx\platform\third_party\win32\libraries\*.*" "$(OutDir)"
-</Command>
+xcopy /Y /Q "$(ProjectDir)..\..\cocos2dx\platform\third_party\win32\libraries\*.*" "$(OutDir)"</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>opengl32.lib;glew32.lib;libxml2.lib;libzlib.lib;libpng.lib;libjpeg.lib;libtiff.lib;libiconv.lib;pthreadVCE2.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -106,8 +105,7 @@ xcopy /Y /Q "$(ProjectDir)..\..\cocos2dx\platform\third_party\win32\libraries\*.
     </ClCompile>
     <PreLinkEvent>
       <Command>if not exist "$(OutDir)" mkdir "$(OutDir)"
-xcopy /Y /Q "$(SolutionDir)cocos2dx\platform\third_party\win32\libraries\*.*" "$(OutDir)"
-</Command>
+xcopy /Y /Q "$(ProjectDir)..\..\cocos2dx\platform\third_party\win32\libraries\*.*" "$(OutDir)"</Command>
     </PreLinkEvent>
     <Link>
       <AdditionalDependencies>opengl32.lib;glew32.lib;libxml2.lib;libzlib.lib;libpng.lib;libjpeg.lib;libtiff.lib;libiconv.lib;pthreadVCE2.lib;%(AdditionalDependencies)</AdditionalDependencies>
