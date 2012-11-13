@@ -47,7 +47,7 @@ public:
     virtual void end();
     virtual void swapBuffers();
     virtual bool setContentScaleFactor(float contentScaleFactor);
-    virtual void setFrameSize(float width, float height);
+    virtual void setFrameSize(float width, float height, HWND parent=NULL);
     virtual void setIMEKeyboardState(bool bOpen);
     virtual bool enableRetina();
 
@@ -55,7 +55,7 @@ public:
     void setWndProc(CUSTOM_WND_PROC proc);
 
 private:
-    virtual bool Create(LPCTSTR pTitle, int w, int h);
+    virtual bool Create(LPCTSTR pTitle, int w, int h, HWND parent);
     bool initGL();
     void destroyGL();
 public:
@@ -80,6 +80,7 @@ protected:
 private:
     bool m_bCaptured;
     HWND m_hWnd;
+	HWND m_hWndParent;
     HDC  m_hDC;
     HGLRC m_hRC;
     LPFN_ACCELEROMETER_KEYHOOK m_lpfnAccelerometerKeyHook;

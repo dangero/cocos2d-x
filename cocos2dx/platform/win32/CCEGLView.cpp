@@ -86,6 +86,7 @@ static LRESULT CALLBACK _WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 CCEGLView::CCEGLView()
 : m_bCaptured(false)
 , m_hWnd(NULL)
+, m_hWndParent(NULL)
 , m_hDC(NULL)
 , m_hRC(NULL)
 , m_lpfnAccelerometerKeyHook(NULL)
@@ -162,8 +163,9 @@ void CCEGLView::destroyGL()
     }
 }
 
-bool CCEGLView::Create(LPCTSTR pTitle, int w, int h)
+bool CCEGLView::Create(LPCTSTR pTitle, int w, int h, HWND parent)
 {
+	m_hWndParent = parent;
     bool bRet = false;
     do 
     {
@@ -193,16 +195,22 @@ bool CCEGLView::Create(LPCTSTR pTitle, int w, int h)
         WCHAR wszBuf[50] = {0};
         MultiByteToWideChar(CP_UTF8, 0, m_szViewName, -1, wszBuf, sizeof(wszBuf));
 
+		DWORD dwStyle = 0;
+		if(parent)
+		{
+			dwStyle = WS_CHILD | WS_VISIBLE;
+		}
+
         // create window
         m_hWnd = CreateWindowEx(
-            WS_EX_APPWINDOW | WS_EX_WINDOWEDGE,    // Extended Style For The Window
+            0,    // Extended Style For The Window
             kWindowClassName,                                    // Class Name
             wszBuf,                                                // Window Title
-            WS_CAPTION | WS_POPUPWINDOW | WS_MINIMIZEBOX,        // Defined Window Style
+            dwStyle,        // Defined Window Style
             0, 0,                                                // Window Position
             0,                                                  // Window Width
             0,                                                  // Window Height
-            NULL,                                                // No Parent Window
+            parent,                                                // possible parent, can be null
             NULL,                                                // No Menu
             hInstance,                                            // Instance
             NULL );
@@ -467,13 +475,13 @@ void CCEGLView::resize(int width, int height)
     AdjustWindowRectEx(&rcClient, GetWindowLong(m_hWnd, GWL_STYLE), false, GetWindowLong(m_hWnd, GWL_EXSTYLE));
 
     // change width and height
-    SetWindowPos(m_hWnd, 0, 0, 0, width + ptDiff.x, height + ptDiff.y,
-                 SWP_NOCOPYBITS | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+    SetWindowPos(m_hWnd, 0, -100, -100, width + ptDiff.x, height + ptDiff.y,
+                 SWP_NOCOPYBITS | SWP_NOOWNERZORDER | SWP_NOZORDER);
 }
 
-void CCEGLView::setFrameSize(float width, float height)
+void CCEGLView::setFrameSize(float width, float height, HWND parent)
 {
-    Create((LPCTSTR)m_szViewName, (int)width, (int)height);
+    Create((LPCTSTR)m_szViewName, (int)width, (int)height, parent);
     CCEGLViewProtocol::setFrameSize(width, height);
 
     resize(width, height); // adjust window size for menubar
@@ -509,7 +517,10 @@ void CCEGLView::centerWindow()
     int offsetY = (rcDesktop.bottom - rcDesktop.top - (rcWindow.bottom - rcWindow.top)) / 2;
     offsetY = (offsetY > 0) ? offsetY : rcDesktop.top;
 
-    SetWindowPos(m_hWnd, 0, offsetX, offsetY, 0, 0, SWP_NOCOPYBITS | SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+	if(m_hWndParent)
+		SetWindowPos(m_hWnd, 0, 0, 0, 0, 0, SWP_NOCOPYBITS | SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+	else
+		SetWindowPos(m_hWnd, 0, offsetX, offsetY, 0, 0, SWP_NOCOPYBITS | SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER);
 }
 
 bool CCEGLView::setContentScaleFactor(float contentScaleFactor)

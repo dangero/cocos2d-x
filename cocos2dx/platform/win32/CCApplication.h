@@ -19,7 +19,7 @@ public:
     /**
     @brief    Run the message loop.
     */
-    int run();
+    int run(bool sleep=true);
 
     /**
     @brief    Get current applicaiton instance.

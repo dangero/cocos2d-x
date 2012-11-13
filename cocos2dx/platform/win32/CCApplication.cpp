@@ -30,7 +30,7 @@ CCApplication::~CCApplication()
     sm_pSharedApplication = NULL;
 }
 
-int CCApplication::run()
+int CCApplication::run(bool sleep)
 {
     PVRFrameEnableControlWindow(false);
 
@@ -53,7 +53,7 @@ int CCApplication::run()
     pMainWnd->centerWindow();
     ShowWindow(pMainWnd->getHWnd(), SW_SHOW);
 
-    while (1)
+    do
     {
         if (! PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
@@ -68,7 +68,8 @@ int CCApplication::run()
             }
             else
             {
-                Sleep(0);
+				if(sleep)
+					Sleep(0);
             }
             continue;
         }
@@ -86,6 +87,7 @@ int CCApplication::run()
             DispatchMessage(&msg);
         }
     }
+	while(sleep);
 
     return (int) msg.wParam;
 }
