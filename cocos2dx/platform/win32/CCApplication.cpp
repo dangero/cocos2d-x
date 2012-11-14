@@ -30,66 +30,83 @@ CCApplication::~CCApplication()
     sm_pSharedApplication = NULL;
 }
 
-int CCApplication::run(bool sleep)
+int CCApplication::run(bool processmessages)
 {
-    PVRFrameEnableControlWindow(false);
+	// Main message loop:
+	static int firstpass = 0;
+	static LARGE_INTEGER nFreq;
+	static LARGE_INTEGER nLast;
+	static LARGE_INTEGER nNow;
+	if(firstpass++==0)
+	{
+		PVRFrameEnableControlWindow(false);
 
-    // Main message loop:
-    MSG msg;
-    LARGE_INTEGER nFreq;
-    LARGE_INTEGER nLast;
-    LARGE_INTEGER nNow;
+		QueryPerformanceFrequency(&nFreq);
+		QueryPerformanceCounter(&nLast);
 
-    QueryPerformanceFrequency(&nFreq);
-    QueryPerformanceCounter(&nLast);
+		// Initialize instance and cocos2d.
+		if (!applicationDidFinishLaunching())
+		{
+			return 0;
+		}
 
-    // Initialize instance and cocos2d.
-    if (!applicationDidFinishLaunching())
-    {
-        return 0;
-    }
+		CCEGLView* pMainWnd = CCEGLView::sharedOpenGLView();
+		pMainWnd->centerWindow();
+		ShowWindow(pMainWnd->getHWnd(), SW_SHOW);
+	}
 
-    CCEGLView* pMainWnd = CCEGLView::sharedOpenGLView();
-    pMainWnd->centerWindow();
-    ShowWindow(pMainWnd->getHWnd(), SW_SHOW);
+	if(processmessages)
+	{
+		MSG msg;
+		do
+		{
+			if (! PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			{
+				// Get current time tick.
+				QueryPerformanceCounter(&nNow);
 
-    do
-    {
-        if (! PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-        {
-            // Get current time tick.
-            QueryPerformanceCounter(&nNow);
-
-            // If it's the time to draw next frame, draw it, else sleep a while.
-            if (nNow.QuadPart - nLast.QuadPart > m_nAnimationInterval.QuadPart)
-            {
-                nLast.QuadPart = nNow.QuadPart;
-                CCDirector::sharedDirector()->mainLoop();
-            }
-            else
-            {
-				if(sleep)
+				// If it's the time to draw next frame, draw it, else sleep a while.
+				if (nNow.QuadPart - nLast.QuadPart > m_nAnimationInterval.QuadPart)
+				{
+					nLast.QuadPart = nNow.QuadPart;
+					CCDirector::sharedDirector()->mainLoop();
+				}
+				else
+				{
 					Sleep(0);
-            }
-            continue;
-        }
+				}
+				continue;
+			}
 
-        if (WM_QUIT == msg.message)
-        {
-            // Quit message loop.
-            break;
-        }
+			if (WM_QUIT == msg.message)
+			{
+				// Quit message loop.
+				break;
+			}
 
-        // Deal with windows message.
-        if (! m_hAccelTable || ! TranslateAccelerator(msg.hwnd, m_hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-    }
-	while(sleep);
+			// Deal with windows message.
+			if (! m_hAccelTable || ! TranslateAccelerator(msg.hwnd, m_hAccelTable, &msg))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		}
+		while(1);
 
-    return (int) msg.wParam;
+		return (int) msg.wParam;
+	}
+	else
+	{
+		QueryPerformanceCounter(&nNow);
+
+		// If it's the time to draw next frame, draw it, else sleep a while.
+		if (nNow.QuadPart - nLast.QuadPart > m_nAnimationInterval.QuadPart)
+		{
+			nLast.QuadPart = nNow.QuadPart;
+			CCDirector::sharedDirector()->mainLoop();
+		}
+		return 0;
+	}
 }
 
 void CCApplication::setAnimationInterval(double interval)
