@@ -518,7 +518,7 @@ void CCEGLView::centerWindow()
     offsetY = (offsetY > 0) ? offsetY : rcDesktop.top;
 
 	if(m_hWndParent)
-		SetWindowPos(m_hWnd, 0, 0, 0, 0, 0, SWP_NOCOPYBITS | SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+		SetWindowPos(m_hWnd, 0, 0, 24, 0, 0, SWP_NOCOPYBITS | SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER);
 	else
 		SetWindowPos(m_hWnd, 0, offsetX, offsetY, 0, 0, SWP_NOCOPYBITS | SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER);
 }
